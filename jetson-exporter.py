@@ -117,7 +117,7 @@ class CustomCollector(object):
                 labels=["statistic"],
                 unit="s"
             )
-            uptime_gauge.add_metric(["alive"], value=self._jetson.uptime["total_seconds"])
+            uptime_gauge.add_metric(["alive"], value=self._jetson.uptime.total_seconds())
             yield uptime_gauge
 
             # Temperature
