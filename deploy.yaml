@@ -17,11 +17,11 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: beta.kubernetes.io/os
+                  - key: kubernetes.io/os  # Cambiato da beta.kubernetes.io/os
                     operator: In
                     values:
                       - linux
-                  - key: beta.kubernetes.io/arch
+                  - key: kubernetes.io/arch  # Cambiato da beta.kubernetes.io/arch
                     operator: In
                     values:
                       - arm64
@@ -33,6 +33,12 @@ spec:
           volumeMounts:
             - mountPath: /run/jtop.sock
               name: jtop-sock
+            - name: sys-volume
+              mountPath: /sys
+            - name: proc-volume
+              mountPath: /proc
+            - name: dev-volume
+              mountPath: /dev
       dnsPolicy: ClusterFirst
       hostNetwork: true
       restartPolicy: Always
@@ -45,3 +51,16 @@ spec:
             path: /run/jtop.sock
             type: Socket
           name: jtop-sock
+        - name: sys-volume
+          hostPath:
+            path: /sys
+            type: Directory
+        - name: proc-volume
+          hostPath:
+            path: /proc
+            type: Directory
+        - name: dev-volume
+          hostPath:
+            path: /dev
+            type: Directory
+
