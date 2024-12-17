@@ -54,23 +54,24 @@ class CustomCollector(object):
             # Board info
             i = InfoMetricFamily('jetson_info_board', 'Board sys info', labels=['board_info'])
             i.add_metric(['info'], {
-                'machine': self._jetson.board['platform']['machine'], 
-                'jetpack': self._jetson.board['platform']['jetpack'], 
-                'l4t': self._jetson.board['platform']['L4T']
+                'machine': self._jetson.board['platform']['Machine'], 
+                'jetpack': self._jetson.board['hardware']['Jetpack'], 
+                'l4t': self._jetson.board['hardware']['L4T']
             })
             yield i
 
             # Board hardware info
             i = InfoMetricFamily('jetson_info_hardware', 'Board hardware info', labels=['board_hw'])
             i.add_metric(['hardware'], {
-                'type': self._jetson.board['hardware']['TYPE'],
-                'codename': self._jetson.board['hardware']['CODENAME'],
-                'soc': self._jetson.board['hardware']['SOC'],
-                'chip_id': self._jetson.board['hardware']['CHIP_ID'],
-                'module': self._jetson.board['hardware']['MODULE'],
-                'board': self._jetson.board['hardware']['BOARD'],
-                'cuda_arch_bin': self._jetson.board['hardware']['CUDA_ARCH_BIN'],
-                'serial_number': self._jetson.board['hardware']['SERIAL_NUMBER']
+                'model': self._jetson.board['hardware'].get('Model', 'unknown'),
+                'part_number': self._jetson.board['hardware'].get('699-level Part Number', 'unknown'),
+                'p_number': self._jetson.board['hardware'].get('P-Number', 'unknown'),
+                'board_ids': self._jetson.board['hardware'].get('BoardIDs', 'unknown'),
+                'module': self._jetson.board['hardware'].get('Module', 'unknown'),
+                'soc': self._jetson.board['hardware'].get('SoC', 'unknown'),
+                'cuda_arch_bin': self._jetson.board['hardware'].get('CUDA Arch BIN', 'unknown'),
+                'codename': self._jetson.board['hardware'].get('Codename', 'unknown'),
+                'serial_number': self._jetson.board['hardware'].get('Serial Number', 'unknown')
             })
             yield i
 
