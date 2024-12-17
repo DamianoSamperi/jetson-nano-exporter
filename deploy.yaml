@@ -26,7 +26,7 @@ spec:
                     values:
                       - arm64
       containers:
-        - image: dami00/jetson-stats-node-exporter:v1.0.0
+        - image: dami00/jetson-stats-node-exporter:v1.0.2
           name: jetson-exporter
           securityContext:
             privileged: true
