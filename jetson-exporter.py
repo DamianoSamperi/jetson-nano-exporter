@@ -94,9 +94,12 @@ class CustomCollector(object):
                 labels=["statistic"],
                 unit="kB"
             )
-            ram_gauge.add_metric(["total"], value=self._jetson.ram['tot'])
-            ram_gauge.add_metric(["used"], value=self._jetson.ram['used'])
-            ram_gauge.add_metric(["free"], value=self._jetson.ram['free'])
+            ram_gauge.add_metric(["total"], value=self.jetson.jtop_stats["mem"]["RAM"]["tot"])
+            ram_gauge.add_metric(["used"], value=self.jetson.jtop_stats["mem"]["RAM"]["used"])
+            ram_gauge.add_metric(["buffers"], value=self.jetson.jtop_stats["mem"]["RAM"]["buffers"])
+            ram_gauge.add_metric(["cached"], value=self.jetson.jtop_stats["mem"]["RAM"]["cached"])
+            ram_gauge.add_metric(["lfb"], value=self.jetson.jtop_stats["mem"]["RAM"]["lfb"])
+            ram_gauge.add_metric(["free"], value=self.jetson.jtop_stats["mem"]["RAM"]["free"])
             yield ram_gauge
 
             # Swap Usage
@@ -106,8 +109,10 @@ class CustomCollector(object):
                 labels=["statistic"],
                 unit="kB"
             )
-            swap_gauge.add_metric(["total"], value=self._jetson.swap['tot'])
-            swap_gauge.add_metric(["used"], value=self._jetson.swap['used'])
+
+            swap_gauge.add_metric(["total"], value=self.jetson.jtop_stats["mem"]["SWAP"]["tot"])
+            swap_gauge.add_metric(["used"], value=self.jetson.jtop_stats["mem"]["SWAP"]["used"])
+            swap_gauge.add_metric(["cached"], value=self.jetson.jtop_stats["mem"]["SWAP"]["cached"])
             yield swap_gauge
 
             # Disk Usage
@@ -122,6 +127,7 @@ class CustomCollector(object):
                     disk_gauge.add_metric(["total"], value=disk_info["total"])
                     disk_gauge.add_metric(["used"], value=disk_info["used"])
                     disk_gauge.add_metric(["free"], value=disk_info["free"])
+                    disk_gauge.add_metric(["percent"], value=disk_info["percent"])
             yield disk_gauge
 
             # Uptime
@@ -131,7 +137,7 @@ class CustomCollector(object):
                 labels=["statistic"],
                 unit="s"
             )
-            uptime_gauge.add_metric(["alive"], value=self._jetson.uptime.total_seconds())
+            uptime_gauge.add_metric(["alive"], value=self.jetson.jtop_stats["upt"].total_seconds())
             yield uptime_gauge
 
             # Temperature
@@ -141,8 +147,8 @@ class CustomCollector(object):
                 labels=["statistic", "machine_part"],
                 unit="C"
             )
-            for part, temp in self._jetson.temperature.items():
-                temperature_gauge.add_metric([part], value=temp)
+            for part, temp in self._jetson.jtop_stats['tmp'].items():
+                temperature_gauge.add_metric([part], value=temp["temp"])
             yield temperature_gauge
 
 # Funzione principale
