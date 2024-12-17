@@ -54,9 +54,9 @@ class CustomCollector(object):
             # Board info
             i = InfoMetricFamily('jetson_info_board', 'Board sys info', labels=['board_info'])
             i.add_metric(['info'], {
-                'machine': self._jetson.board['info']['machine'], 
-                'jetpack': self._jetson.board['info']['jetpack'], 
-                'l4t': self._jetson.board['info']['L4T']
+                'machine': self._jetson.board['platform']['machine'], 
+                'jetpack': self._jetson.board['platform']['jetpack'], 
+                'l4t': self._jetson.board['platform']['L4T']
             })
             yield i
 
