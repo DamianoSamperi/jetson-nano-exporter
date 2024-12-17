@@ -1,13 +1,14 @@
-FROM python:3.6-slim
+FROM arm64v8/python:3.6-slim
 # Imposta la directory di lavoro
 WORKDIR /app
 # Copia il tuo script Python nel contenitore
-COPY jetson_exporter.py /app/jetson_exporter.py
+COPY jetson-exporter.py /app/jetson_exporter.py
 
-RUN apk update \
-    && apk --no-cache add bash \
+RUN apt-get update \
+    && apt-get install -y bash \
     && pip install jetson-stats prometheus-client \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*  # Pulisce i dati di apt-get per ridurre l'immagine
+
 # Espone la porta su cui il server HTTP sarà in ascolto
 EXPOSE 9401
 
