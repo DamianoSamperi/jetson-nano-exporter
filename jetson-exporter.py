@@ -14,21 +14,21 @@ logging.info('Server started on port %s', 9401)
 class CustomCollector(object):
     def __init__(self, update_period=1):
         atexit.register(self.cleanup)
-        self._jetson = jtop()
+        self._jetson = jtop()  # Inizializza l'oggetto jtop
         self._update_period = update_period
         try:
-            self._jetson.start()
+            self._jetson.start()  # Avvia il monitoraggio jtop
         except JtopException as e:
             logging.error("Error starting jtop: %s", e)
             raise
 
     def cleanup(self):
         print("Closing jetson-stats connection...")
-        self._jetson.close()
+        self._jetson.close()  # Chiude la connessione a jtop
 
     def collect(self):
-        if self._jetson.ok():
-            # Board info
+        if self._jetson.ok():  # Verifica se la connessione è ok
+            # Esempio di informazioni sulla board
             board_info = InfoMetricFamily(
                 'jetson_info_board',
                 'Board sys info',
@@ -41,26 +41,7 @@ class CustomCollector(object):
             })
             yield board_info
 
-            # Board hardware info
-            hardware_info = InfoMetricFamily(
-                'jetson_info_hardware',
-                'Board hardware info',
-                labels=['board_hw']
-            )
-            hardware_info.add_metric(['hardware'], {
-                'model': self._jetson.board['hardware'].get('Model', 'unknown'),
-                'part_number': self._jetson.board['hardware'].get('699-level Part Number', 'unknown'),
-                'p_number': self._jetson.board['hardware'].get('P-Number', 'unknown'),
-                'board_ids': self._jetson.board['hardware'].get('BoardIDs', 'unknown'),
-                'module': self._jetson.board['hardware'].get('Module', 'unknown'),
-                'soc': self._jetson.board['hardware'].get('SoC', 'unknown'),
-                'cuda_arch_bin': self._jetson.board['hardware'].get('CUDA Arch BIN', 'unknown'),
-                'codename': self._jetson.board['hardware'].get('Codename', 'unknown'),
-                'serial_number': self._jetson.board['hardware'].get('Serial Number', 'unknown')
-            })
-            yield hardware_info
-
-            # CPU Usage
+            # Esempio di informazioni sul processore CPU
             cpu_gauge = GaugeMetricFamily(
                 name="cpu_usage",
                 documentation="CPU Usage from Jetson Stats",
@@ -74,7 +55,7 @@ class CustomCollector(object):
                 cpu_gauge.add_metric([str(core_number), "val"], value=core_data["idle"])
             yield cpu_gauge
 
-            # GPU Usage
+            # Esempio di utilizzo della GPU
             gpu_gauge = GaugeMetricFamily(
                 name="gpu_utilization_percentage",
                 documentation="GPU Usage from Jetson Stats",
@@ -87,35 +68,34 @@ class CustomCollector(object):
                 gpu_gauge.add_metric([gpu_name, "max_freq"], value=self._jetson.gpu[gpu_name]["freq"]["max"])
             yield gpu_gauge
 
-            # RAM Usage
+            # Esempio di utilizzo della RAM
             ram_gauge = GaugeMetricFamily(
                 name="ram_usage",
                 documentation="RAM Usage from Jetson Stats",
                 labels=["statistic"],
                 unit="kB"
             )
-            ram_gauge.add_metric(["total"], value=self.jetson.jtop_stats["mem"]["RAM"]["tot"])
-            ram_gauge.add_metric(["used"], value=self.jetson.jtop_stats["mem"]["RAM"]["used"])
-            ram_gauge.add_metric(["buffers"], value=self.jetson.jtop_stats["mem"]["RAM"]["buffers"])
-            ram_gauge.add_metric(["cached"], value=self.jetson.jtop_stats["mem"]["RAM"]["cached"])
-            ram_gauge.add_metric(["lfb"], value=self.jetson.jtop_stats["mem"]["RAM"]["lfb"])
-            ram_gauge.add_metric(["free"], value=self.jetson.jtop_stats["mem"]["RAM"]["free"])
+            ram_gauge.add_metric(["total"], value=self._jetson.jtop_stats["mem"]["RAM"]["tot"])
+            ram_gauge.add_metric(["used"], value=self._jetson.jtop_stats["mem"]["RAM"]["used"])
+            ram_gauge.add_metric(["buffers"], value=self._jetson.jtop_stats["mem"]["RAM"]["buffers"])
+            ram_gauge.add_metric(["cached"], value=self._jetson.jtop_stats["mem"]["RAM"]["cached"])
+            ram_gauge.add_metric(["lfb"], value=self._jetson.jtop_stats["mem"]["RAM"]["lfb"])
+            ram_gauge.add_metric(["free"], value=self._jetson.jtop_stats["mem"]["RAM"]["free"])
             yield ram_gauge
 
-            # Swap Usage
+            # Esempio di utilizzo dello Swap
             swap_gauge = GaugeMetricFamily(
                 name="swap_usage",
                 documentation="Swap Usage from Jetson Stats",
                 labels=["statistic"],
                 unit="kB"
             )
-
-            swap_gauge.add_metric(["total"], value=self.jetson.jtop_stats["mem"]["SWAP"]["tot"])
-            swap_gauge.add_metric(["used"], value=self.jetson.jtop_stats["mem"]["SWAP"]["used"])
-            swap_gauge.add_metric(["cached"], value=self.jetson.jtop_stats["mem"]["SWAP"]["cached"])
+            swap_gauge.add_metric(["total"], value=self._jetson.jtop_stats["mem"]["SWAP"]["tot"])
+            swap_gauge.add_metric(["used"], value=self._jetson.jtop_stats["mem"]["SWAP"]["used"])
+            swap_gauge.add_metric(["cached"], value=self._jetson.jtop_stats["mem"]["SWAP"]["cached"])
             yield swap_gauge
 
-            # Disk Usage
+            # Esempio di utilizzo del Disco
             disk_gauge = GaugeMetricFamily(
                 name="disk_usage",
                 documentation="Disk Usage from Jetson Stats",
@@ -137,7 +117,7 @@ class CustomCollector(object):
                 labels=["statistic"],
                 unit="s"
             )
-            uptime_gauge.add_metric(["alive"], value=self.jetson.jtop_stats["upt"].total_seconds())
+            uptime_gauge.add_metric(["alive"], value=self._jetson.jtop_stats["upt"].total_seconds())
             yield uptime_gauge
 
             # Temperature
@@ -165,4 +145,3 @@ if __name__ == '__main__':
     # Mantieni in esecuzione il programma per raccogliere metriche
     while True:
         time.sleep(1)
-
