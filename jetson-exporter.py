@@ -65,7 +65,7 @@ class CustomCollector(object):
                 name="cpu_usage",
                 documentation="CPU Usage from Jetson Stats",
                 labels=["core", "statistic"],
-                unit="%"
+                unit="Hz"
             )
             for core_number, core_data in enumerate(self._jetson.cpu['cpu']):
                 cpu_gauge.add_metric([str(core_number), "freq"], value=core_data["freq"]["cur"])
@@ -79,7 +79,7 @@ class CustomCollector(object):
                 name="gpu_utilization_percentage",
                 documentation="GPU Usage from Jetson Stats",
                 labels=["statistic", "nvidia_gpu"],
-                unit="%"
+                unit="Hz"
             )
             for gpu_name in self._jetson.gpu.keys():
                 gpu_gauge.add_metric([gpu_name, "freq"], value=self._jetson.gpu[gpu_name]["freq"]["cur"])
