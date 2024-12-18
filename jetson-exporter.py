@@ -41,7 +41,7 @@ class CustomCollector(object):
             })
             yield board_info
 
-            # CPU Usage
+            # CPU Usage (absolute)
             cpu_gauge = GaugeMetricFamily(
                 name="cpu_usage",
                 documentation="CPU Usage from Jetson Stats",
@@ -55,9 +55,22 @@ class CustomCollector(object):
                 cpu_gauge.add_metric([str(core_number), "val"], value=core_data["idle"])
             yield cpu_gauge
 
-            # GPU Usage
+            # CPU Usage (percentuale)
+            cpu_usage_percentage_gauge = GaugeMetricFamily(
+                name="cpu_usage_percentage",
+                documentation="CPU Usage Percentage from Jetson Stats",
+                labels=["core"],
+            )
+            for core_number, core_data in enumerate(self._jetson.cpu['cpu']):
+                idle_time = core_data["idle"]
+                total_time = core_data["idle"] + core_data["user"] + core_data["system"]
+                cpu_usage_percentage = 100 - (idle_time / total_time * 100)
+                cpu_usage_percentage_gauge.add_metric([str(core_number)], value=cpu_usage_percentage)
+            yield cpu_usage_percentage_gauge
+
+            # GPU Usage (absolute)
             gpu_gauge = GaugeMetricFamily(
-                name="gpu_utilization_percentage",
+                name="gpu_utilization",
                 documentation="GPU Usage from Jetson Stats",
                 labels=["statistic", "nvidia_gpu"],
                 unit="Hz"
@@ -68,7 +81,18 @@ class CustomCollector(object):
                 gpu_gauge.add_metric([gpu_name, "max_freq"], value=self._jetson.gpu[gpu_name]["freq"]["max"])
             yield gpu_gauge
 
-            # RAM Usage
+            # GPU Usage (percentuale)
+            gpu_usage_percentage_gauge = GaugeMetricFamily(
+                name="gpu_usage_percentage",
+                documentation="GPU Utilization Percentage from Jetson Stats",
+                labels=["nvidia_gpu"],
+            )
+            for gpu_name in self._jetson.gpu.keys():
+                gpu_usage_percentage = self._jetson.gpu[gpu_name].get("utilization", 0)  # Assumendo che "utilization" contenga il valore percentuale
+                gpu_usage_percentage_gauge.add_metric([gpu_name], value=gpu_usage_percentage)
+            yield gpu_usage_percentage_gauge
+
+            # RAM Usage (absolute)
             ram_gauge = GaugeMetricFamily(
                 name="ram_usage",
                 documentation="RAM Usage from Jetson Stats",
@@ -82,6 +106,16 @@ class CustomCollector(object):
             ram_gauge.add_metric(["lfb"], value=self._jetson.memory["RAM"]["lfb"])
             ram_gauge.add_metric(["free"], value=self._jetson.memory["RAM"]["free"])
             yield ram_gauge
+
+            # RAM Usage (percentuale)
+            ram_usage_percentage_gauge = GaugeMetricFamily(
+                name="ram_usage_percentage",
+                documentation="RAM Usage Percentage from Jetson Stats",
+                labels=["statistic"]
+            )
+            ram_usage_percentage = (self._jetson.memory["RAM"]["used"] / self._jetson.memory["RAM"]["tot"]) * 100
+            ram_usage_percentage_gauge.add_metric(["used"], value=ram_usage_percentage)
+            yield ram_usage_percentage_gauge
 
             # Swap Usage
             swap_gauge = GaugeMetricFamily(
