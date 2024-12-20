@@ -1,6 +1,6 @@
 # jetson-exporter
 
- exporter for nvidia jetson with promehteus and grafana link 
+ exporter for nvidia jetson with promehteus and grafana link , exporter is connected to the port 9401
  
 ## QuickStart
 ### kubernetes
