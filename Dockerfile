@@ -6,7 +6,7 @@ COPY jetson-exporter.py /app/jetson_exporter.py
 
 RUN apt-get update \
     && apt-get install -y bash \
-    && pip install jetson-stats prometheus-client \
+    && pip install --no-cache-dir jetson-stats prometheus-client \
     && rm -rf /var/lib/apt/lists/*  # Pulisce i dati di apt-get per ridurre l'immagine
 
 # Espone la porta su cui il server HTTP sarà in ascolto
