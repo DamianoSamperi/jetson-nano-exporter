@@ -87,9 +87,12 @@ class CustomCollector(object):
                 documentation="GPU Utilization Percentage from Jetson Stats",
                 labels=["nvidia_gpu"],
             )
+            
+            # Itera attraverso tutte le GPU disponibili
             for gpu_name in self._jetson.gpu.keys():
-                gpu_usage_percentage = self._jetson.gpu[gpu_name].get("utilization", 0)  # Assumendo che "utilization" contenga il valore percentuale
-                gpu_usage_percentage_gauge.add_metric([gpu_name], value=gpu_usage_percentage)
+                # Usa 'load' invece di 'utilization'
+                gpu_usage_percentage = self._jetson.gpu[gpu_name].get("load", 0)  # Usa 'load' per ottenere il carico della GPU
+                gpu_usage_percentage_gauge.add_metric([gpu_name], value=gpu_usage_percentage)            
             yield gpu_usage_percentage_gauge
 
             # RAM Usage (absolute)
