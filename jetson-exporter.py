@@ -91,7 +91,7 @@ class CustomCollector(object):
             # Itera attraverso tutte le GPU disponibili
             for gpu_name in self._jetson.gpu.keys():
                 # Usa 'load' invece di 'utilization'
-                gpu_usage_percentage = self._jetson.gpu[gpu_name].get("load", 0)  # Usa 'load' per ottenere il carico della GPU
+                gpu_usage_percentage = self._jetson.gpu[gpu_name]["status"]["load"]  
                 gpu_usage_percentage_gauge.add_metric([gpu_name], value=gpu_usage_percentage)            
             yield gpu_usage_percentage_gauge
 
