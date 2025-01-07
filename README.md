@@ -14,7 +14,7 @@ kubectl apply  -f  ./deploy.yaml
 you can connect to prometheus in port 30090, i use the istallation of prometheus in this guide:
 https://docs.nvidia.com/datacenter/cloud-native/gpu-telemetry/latest/kube-prometheus.html
 but the additionalconfigscrape is this for my exporter:
-    additionalScrapeConfigs: 
+```    additionalScrapeConfigs: 
     - job_name: 'jetson-exporter'
       scrape_interval: 5s
       kubernetes_sd_configs:
@@ -49,7 +49,7 @@ but the additionalconfigscrape is this for my exporter:
           - __meta_kubernetes_pod_ip
         target_label: __address__
         replacement: "${1}:9401"
-
+```
 
 ## Grafana
 
