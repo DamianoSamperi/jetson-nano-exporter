@@ -232,7 +232,7 @@ class CustomCollector(object):
                     pod_gpu_memory_usage[pod] = pod_gpu_memory_usage.get(pod, 0) + gpu_mem_used
 
                     logging.debug(f"Pod: {pod}, GPU Memory Used: {gpu_mem_used} MB")
-
+            
             # Aggiunta delle metriche alla raccolta
             for pod, usage in pod_gpu_usage.items():
                 gpu_pod_usage_gauge.add_metric([pod], value=usage)
@@ -243,7 +243,25 @@ class CustomCollector(object):
             # Restituisce entrambe le metriche
             yield gpu_pod_usage_gauge
             yield gpu_pod_memory_usage_gauge
-
+            # Potenza
+            power_gauge = GaugeMetricFamily(
+                "power_consumption", "Power consumption from Jetson Stats",
+                labels=["rail"], unit="mW"
+            )
+            try:
+                power_data = self._jetson.power
+                # potenza totale della board
+                tot = power_data.get("tot", {})
+                if "power" in tot:
+                    power_gauge.add_metric(["total"], value=tot["power"])
+                # potenza per singolo rail (VDD_GPU_SOC, VDD_CPU_CV, ecc.)
+                for rail_name, rail_data in power_data.get("rail", {}).items():
+                    if isinstance(rail_data, dict) and rail_data.get("online") and "power" in rail_data:
+                        power_gauge.add_metric([rail_name], value=rail_data["power"])
+            except Exception as e:
+                logging.warning(f"Power data not available: {e}")
+            yield power_gauge
+            
             # RAM Usage
             ram_gauge = GaugeMetricFamily(
                 "ram_usage", "RAM Usage from Jetson Stats",
